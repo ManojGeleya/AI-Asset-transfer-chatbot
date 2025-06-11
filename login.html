@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Blockchain ChatBot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .metamask-button {
+            background-color: #f6851b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto;
+            transition: background-color 0.3s;
+        }
+        .metamask-button:hover {
+            background-color: #e2761b;
+        }
+        .metamask-logo {
+            width: 30px;
+            height: 30px;
+        }
+        .title {
+            color: #1a1a1a;
+            margin-bottom: 2rem;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="title">Welcome to Blockchain ChatBot</h1>
+        <p>Please connect with MetaMask to continue</p>
+        <button id="connectMetamask" class="metamask-button">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/768px-MetaMask_Fox.svg.png?20220831120339" 
+                 alt="MetaMask" 
+                 class="metamask-logo">
+            Connect with MetaMask
+        </button>
+        <div id="error-message" class="error-message"></div>
+    </div>
+
+    <script>
+        document.getElementById('connectMetamask').addEventListener('click', async () => {
+            if (typeof window.ethereum === 'undefined') {
+                showError('Please install MetaMask to continue');
+                return;
+            }
+
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+                
+                // Send the address to your backend
+                const response = await fetch('/connect-metamask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ wallet_address: account })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Redirect to chat interface
+                    window.location.href = '/chat';
+                } else {
+                    showError(data.error);
+                }
+            } catch (error) {
+                if (error.code === 4001) {
+                    showError('Please connect your MetaMask wallet to continue');
+                } else {
+                    showError('An error occurred. Please try again.');
+                }
+            }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html> 

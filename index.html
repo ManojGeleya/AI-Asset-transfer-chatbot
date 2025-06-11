@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain ChatBot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Blockchain ChatBot</h1>
+            <div class="header-right">
+                <div class="wallet-info">
+                    Connected: {{ session['wallet_address'][:6] }}...{{ session['wallet_address'][-4:] }}
+                </div>
+                <button id="logout-button" class="logout-button">Logout</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            {% if initial_message %}
+                <div class="bot-message">
+                    <pre>{{ initial_message }}</pre>
+                </div>
+            {% endif %}
+        </div>
+        <div class="chat-input">
+            <form id="chat-form">
+                <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
